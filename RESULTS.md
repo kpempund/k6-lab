@@ -31,3 +31,31 @@ In A5, the full 30-second ramp-up, 10-minute hold at 2 users, and 30-second ramp
 
 ## Part B
 
+1. I filled in the Part A results table above with the measured request rate, overall p(95), maximum duration, request failure rate, and check success rate for all five runs. Every Part A run had 0.00% failed requests and 100.00% passing checks.
+
+2. In Step 0.2, five virtual users made 80 requests at 3.864824 requests/s. Each user waited for its HTTP response and then slept for one second. The average iteration took about 1.29 seconds, including initial connection overhead. Because each user starts its next request only after finishing that iteration, the rate stays below five requests/s. Five users describes concurrency, not five requests arriving every second.
+
+3. I did not observe an increase in overall p(95) from average load to stress. It decreased from 361.39 ms at 3 users to 357.47 ms at 5 users, about 1.1%, while throughput increased from 1.346876 to 2.174993 requests/s. Both runs passed the home-page and recommendation thresholds and had no failed requests. These small loads appear to be inside the system's operational envelope. They do not identify its upper limit or prove how it would behave under much heavier load. The small difference could come from random response variation, network conditions, or other users on the shared site.
+
+4. I observed no sustained latency rise during the spike and no detectable recovery delay afterward. The five-user hold was at 35-65 seconds and ramp-down to one user finished at 70 seconds. Before the spike, p(95) was 358.03 ms; during the hold it was 343.89 ms; during 70-100 seconds it was 339.97 ms. The first complete 10-second interval after ramp-down was already within the earlier range. I can therefore say there was no delay visible at the report's 10-second resolution, but I cannot claim an exact sub-second recovery time from this small sample.
+
+5. The late soak window was slightly slower: p(95) increased from 347.90 ms in seconds 30-150 to 355.97 ms in seconds 510-630, about 2.3%. The average changed only from 275.98 ms to 277.16 ms. Both windows had 0.00% failed requests, as did the whole run. The report shows a temporary bump followed by lower latency, so I did not see a clear progressive slowdown or rising error rate. This short run cannot rule out long-term defects. A soak test lasting several hours could reveal a memory leak that gradually exhausts available memory and eventually causes slow responses or failures.
+
+6. An average can hide a small group of very slow requests. A p(95) threshold checks the response time experienced by the slower part of the user population: at least 95% of requests must be below the chosen limit. In A2, for example, the average was 279.59 ms but p(95) was 361.39 ms. A requirement about 95% of requests is therefore checked more directly with p(95) than with the average.
+
+7. First, an internet run includes changing network distance, routing, congestion, and connection setup; a controlled local network can have much lower and more stable latency. Second, QuickPizza is shared with other learners, so its competing workload is outside my control; a dedicated lab can control background traffic, server resources, and configuration. Either difference can change the measurements even when the scripts are identical.
+
+8. Hundreds of virtual users could overwhelm a shared site, interrupt other people's use, and create unexpected resource costs. I need ownership or written permission before testing at that scale. Calling traffic a test does not give me permission to disrupt someone else's service. For QuickPizza, I followed the limit of five users and used only two for the longer soak test.
+
+9. For an everyday messaging app, my vague requirement is: "My chat list should load quickly." A testable version is: "In the app's controlled test environment, with five virtual users repeatedly requesting the conversation-list API for two minutes and pausing one second between iterations, 95% of requests must finish within 1000 ms, 99% within 1500 ms, and fewer than 1% may fail." For a script that requests only that API, these K6 options check the requirement:
+
+   ```javascript
+   export const options = {
+     vus: 5,
+     duration: '2m',
+     thresholds: {
+       http_req_duration: ['p(95)<1000', 'p(99)<1500'],
+       http_req_failed: ['rate<0.01'],
+     },
+   };
+   ```
