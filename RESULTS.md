@@ -8,6 +8,7 @@
 - Step 0.4: All three checks passed: status 200, a pizza name, and every ingredient vegetarian.
 - Step 0.5: The request without a token returned the expected 401. The check passed and `http_req_failed` was 0.00%, because `http.expectedStatuses(401)` treats this refusal as the correct response.
 - Step 0.6: `k6 run 06-thresholds.js` exited with **0**. All three thresholds passed: checks = 100.00%, failures = 0.00%, and p(95) = 367.35 ms < 1500 ms. `k6 run -e P95=300 06-thresholds.js` exited with **99**: p(95) = 363.49 ms exceeded 300 ms, while the checks and failure-rate thresholds still passed.
+- Step 0.7: With 3 users for 30 seconds, all requirement rules passed: p(95) = 371.28 ms < 1000 ms, p(99) = 374.79 ms < 1500 ms, and `http_req_failed` = 0.00% < 1%. The exit code was **0**. I changed only the p(95) requirement from 1000 ms to 1 ms using `-e P95=1`; p(95) = 364.61 ms failed that rule and the exit code was **99**. The p(99) and failure-rate rules still passed. The script keeps the original requirement as its default. I displayed p(99) using `--summary-trend-stats 'avg,min,med,max,p(90),p(95),p(99)'`.
 
 ## Part A results
 
