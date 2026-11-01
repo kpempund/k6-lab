@@ -13,17 +13,21 @@
 
 ## Part A results
 
+Runs were made on 1 November 2026 using K6 v2.3.0. Response times below are in milliseconds, rounded to two decimal places from the measured metrics; K6's terminal display truncates some final decimal places. Req/s is the overall `http_reqs` rate. Users is the highest configured number of virtual users.
+
 | Step | Test type | Users | Req/s | p(95) | Max | Failed | Checks |
 | ---- | --------- | ----- | ----- | ----- | --- | ------ | ------ |
 | A1 | Smoke | 1 | 0.498363 | 322.94 ms | 324.59 ms | 0.00% | 100.00% |
 | A2 | Average load | 3 | 1.346876 | 361.39 ms | 374.71 ms | 0.00% | 100.00% |
 | A3 | Stress | 5 | 2.174993 | 357.47 ms | 464.42 ms | 0.00% | 100.00% |
 | A4 | Spike | 5 | 0.991417 | 348.40 ms | 366.53 ms | 0.00% | 100.00% |
-| A5 | Soak | 2 | | | | | |
+| A5 | Soak | 2 | 0.998389 | 362.25 ms | 398.52 ms | 0.00% | 100.00% |
 
 The overall p(95) decreased from 361.39 ms in A2 to 357.47 ms in A3 (about 1.1% lower), while the request rate increased from 1.346876 to 2.174993 requests/s. Both tests had 0.00% failed requests and 100.00% passing checks.
 
 In A4, the spike ramp begins at 30 seconds, reaches 5 users at 35 seconds, holds until 65 seconds, and returns to 1 user at 70 seconds. The report shows no sustained response-time rise during the spike. Request samples give p(95) = 358.03 ms before the spike (0-30 s), 343.89 ms during the 5-user hold (35-65 s), and 339.97 ms in the first 30 seconds after ramp-down (70-100 s). No recovery delay was observed. The first complete 10-second interval after ramp-down was already within the earlier range, so the report supports recovery within its 10-second sampling resolution, rather than an exact sub-second recovery time. There were no failed requests.
+
+In A5, the full 30-second ramp-up, 10-minute hold at 2 users, and 30-second ramp-down completed. I compared equal two-minute windows within the steady hold: 30-150 seconds and 510-630 seconds. The early window had 122 requests, average duration 275.98 ms, p(95) 347.90 ms, and 0 failed requests. The late window had 125 requests, average duration 277.16 ms, p(95) 355.97 ms, and 0 failed requests. Late p(95) was 8.07 ms (about 2.3%) higher. The report shows fluctuations, including a temporary rise around minutes 7-8 that later fell, rather than a continuous increase. All five Part A runs exited with 0 and passed every configured threshold.
 
 ## Part B
 
