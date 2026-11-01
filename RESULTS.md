@@ -17,8 +17,11 @@
 | ---- | --------- | ----- | ----- | ----- | --- | ------ | ------ |
 | A1 | Smoke | 1 | 0.498363 | 322.94 ms | 324.59 ms | 0.00% | 100.00% |
 | A2 | Average load | 3 | 1.346876 | 361.39 ms | 374.71 ms | 0.00% | 100.00% |
-| A3 | Stress | 5 | | | | | |
+| A3 | Stress | 5 | 2.174993 | 357.47 ms | 464.42 ms | 0.00% | 100.00% |
 | A4 | Spike | 5 | | | | | |
 | A5 | Soak | 2 | | | | | |
 
+The overall p(95) decreased from 361.39 ms in A2 to 357.47 ms in A3 (about 1.1% lower), while the request rate increased from 1.346876 to 2.174993 requests/s. Both tests had 0.00% failed requests and 100.00% passing checks.
+
 ## Part B
+
